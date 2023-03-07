@@ -1,133 +1,105 @@
-# I was helped by Sarah Tran
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
 
 library(shiny)
 library(tidyverse)
+library(dplyr)
 
-sp <- read_delim("student-por.csv")
+student_por <- read_delim("student-por.csv")
+student_por
 
+
+# Define UI for application that draws a histogram
 ui <- fluidPage(
-    fluidRow(navbarPage("Academic Performance for Students from 2 Schools in Portugese",
-      tabPanel("Home", 
-              p("This app uses student academic performance at two Portuguese
-              schools data published on Kaggle, measuring student performance 
-              in two distinct categories: ", 
-              em("Math and Portuguese,"), 
-              " from two secondary schools: ",
-              strong("Gabriel Periera (GP) and Mousinho da Silveira (MS)."), 
-              "The data set originates from UC Irvine Machine Learning 
-              Repository and was collected by Prof. Paulo Cortez at the 
-              Department of Information Systems."),
-              cat("\n"),
-              p("There are ", nrow(sp), "observations and ", 
-                ncol(sp), "variables in the data set."),
-              cat("\n"),
-              p("Here is a small random sample of data:"),
-              mainPanel(
-                tableOutput("sample")
-              )),
-      tabPanel("Plot",
-               sidebarLayout(
-                 sidebarPanel(
-                   p("Here is a bar plot on how extra support relates to 
-                   student's average grades and their health. You can select
-                     age group you are interested in and see what it looks
-                     like."),
-                   column(6,
-                          radioButtons("age", "Choose age",
-                                       choices = c("15", "16", "17",
-                                                    "18", "19", "20",
-                                                      "21", "22"))
-                   ),
-                   column(6,
-                          radioButtons("color1", "Palette",
-                                       choices = c("skyblue", "green", "red",
-                                                            "purple", "gold")),
-                          radioButtons("color2", "Palette",
-                                       choices = c("skyblue", "green", "red",
-                                                            "purple", "gold"))
-                   )
-                 ),
-                 mainPanel(
-                   plotOutput("plot"),
-                   textOutput("plotText")
-                 )
-               )), 
-      tabPanel("Table", 
-               sidebarLayout(
-                 sidebarPanel(
-                   fluidRow(
-                     column(6,
-                            uiOutput("checkboxSex")
-                     )
-                   )
-                ),
-                mainPanel(
-                  tableOutput("table"),
-                  textOutput("text")
-                ))
-               )
-             )
-    )
+  navbarPage("Student dataset",
+  tabPanel("About the dataset", 
+           h1("About the Student Performance Dataset"),
+           p("The dataset describes the academic performance of students at two portuguese schools."),
+           p("It measures sutdent performance in two distinct categories: mathematics and portuguese language"),
+           p("This dataset was originated from UC Irvine Machine Learning Repository."),
+           p("Data was collected by:",
+           strong("prof. Paulo Cortez")),
+           mainPanel(tableOutput("student"))),
+  
+  tabPanel("Plot",
+           h4("Does parent's job influence student's academic performance? [Mjob: mother's job | Fjob: father's job]"),
+           sidebarLayout(
+             sidebarPanel(
+               radioButtons("age", "Select the age group:",
+                            choices = unique(student_por$age),
+                            selected = 15)
+               ),
+             mainPanel(plotOutput("plot"), plotOutput("plot2"), textOutput("jobcount"), tableOutput("eachjob")))),
+  tabPanel("Table",
+           h4("Avg grade of the students by gender"),
+           sidebarLayout(
+             sidebarPanel(
+               radioButtons("sex", "Select the gender:",
+                            choices = unique(student_por$sex),
+                            selected = F)
+               ),
+             mainPanel(tableOutput("grades"), textOutput("sexcount")))),
+  )
 )
+## text
 
+# Define server logic required to draw a histogram
 server <- function(input, output) {
-    
-    output$sample <- renderTable({
-        sp %>% 
-          select(sex, age, G1, G2, G3) %>% 
-          sample_n(5)
+
+    output$student <- renderTable ({
+        # Table for 'About the dataset' page
+        student_por %>% 
+        head(10)
     })
-    
-    
-    
-    ageSample <- reactive({
-      sexDiff <- sp %>%
+    selection <- reactive ({
+      student_por %>% 
         filter(age %in% input$age)
     })
-    
-    output$plot <- renderPlot({
-      ageSample() %>% 
-        group_by(health, schoolsup) %>% 
-        summarize(avgGrades = mean(G1 + G2 + G3)/3) %>% 
-        ggplot(aes(health, avgGrades, fill = schoolsup)) + 
-        geom_col(position = "dodge") + 
-        labs(title = "Health vs. Average Grades with and without Academic Support",
-             x = "Health", y = "Average Grades", fill = "Extra Support") +
-        scale_fill_manual(values = c(input$color1, input$color2))
+    output$plot <- renderPlot ({
+      # Plot for 'student grade vs. (Mjob)'
+      avg_grade <- selection() %>% 
+        mutate(avg = (G1+G2+G3)/n())
+      ggplot(avg_grade, aes(Mjob, avg)) +
+        geom_col()
     })
-    
-    output$plotText <- renderText({
-      paste("This is the how ", input$age," years old students perform
-            and their health with and without extra school support")
+    output$plot2 <- renderPlot ({
+      # Plot for 'student grade vs. (Fjob)'
+      grade_avg <- selection() %>% 
+        mutate(avg = (G1+G2+G3)/n())
+      ggplot(grade_avg, aes(Fjob, avg)) +
+        geom_col()
     })
-    
-    
-    
-    output$checkboxSex <- renderUI({
-      checkboxGroupInput("sex", "Choose sex",
-                         choices = unique(sp$sex)
-      )
+    output$jobcount <- renderText ({
+      count_total <- count(selection())
+      paste("students in age of", input$age, "has", (count_total - 1), "other students in the same age")
     })
-    
-    sample <- reactive({
-      sexDiff <- sp %>%
+    output$eachjob <- renderTable ({
+      total_count <- selection() %>% 
+        summarize(Mjob_count = n_distinct(Mjob), Fjob_count = n_distinct(Fjob)) 
+    })
+    output$grades <- renderTable ({
+      # Table for 'avg grade by each gender' page
+      avg_grade <- selected() %>% 
+        select(G1, G2, G3,sex) %>% 
+        mutate(avg = (G1+G2+G3)/n()) %>% 
+        summarize(sex, avg, avg_grade_by_gender = (sum(avg)/n()) * 100)
+    })
+    selected <- reactive ({
+      student_por %>% 
         filter(sex %in% input$sex)
     })
-    
-    output$table <- renderTable({
-      sample() %>% 
-        group_by(sex, age) %>% 
-        summarize(avgGrade = mean(G1 + G2 + G3)/3)
-    })
-    
-    output$text <- renderText({
-      if(nrow(sample()) == 0)
-        "Please select gender"
-      else
-        paste("Table of ", str_flatten(input$sex, " and "), ", their
-              respective ages and average grades per period, for a
-              total of three periods.")
+    output$sexcount <- renderText ({
+      total_count <- count(selected())
+      paste("There are", total_count, "amount of", input$sex, "students in this dataset. [F stands for female and M stands for male.]")
     })
 }
 
+# Run the application 
 shinyApp(ui = ui, server = server)
+
