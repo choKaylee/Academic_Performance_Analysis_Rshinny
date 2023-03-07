@@ -96,7 +96,7 @@ server <- function(input, output) {
       summarize(avgGrades = mean(G1 + G2 + G3)/3) %>%
       ggplot(aes(age, avgGrades)) +
       geom_line(aes(col = factor(sex))) +
-      labs(x = "Average Grade", y = "Age", title = "Age vs Average Grade by Sex",
+      labs(x = "Age", y = "Average Grade", title = "Age vs Average Grade by Sex",
            col = "Sex")
   })
   
