@@ -34,9 +34,5 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-  output$image1 <- renderImage({
-    outfile <- tempfile(fileext = '.png')
-  })
-  
 }
 shinyApp(ui = ui, server = server)
