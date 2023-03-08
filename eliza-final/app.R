@@ -39,7 +39,8 @@ ui <- fluidPage(
                                suprising seeing that extra support is meant to help kids recieve higher remarks 
                                on their assignments. Another insight was based on the average grades of students
                                compared to their gender. Overall females on average were recieving better grades
-                               than the males. This was especially evident in the younger groups."),
+                               than the males. This was especially evident in the younger groups. Also, as predicted,
+                               students that study more than others tend to have overall higher average grades."),
                              h3("Broader Implications"),
                              p("The implications of these insights are that, educators may want to look further
                                into resources for students that are looking for the extra help. The students that
