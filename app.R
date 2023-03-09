@@ -1,88 +1,79 @@
-library(shiny)
-library(tidyverse)
-library(dplyr)
-
-student_por <- read_delim("student-por.csv")
-student_por
-
-# Define UI for application that draws a histogram
-ui <- fluidPage(
-  ## KAYLEE'S SECTION
-  navbarPage("Student dataset",
-             tabsetPanel(type = "tabs",
-                         tabPanel("Introduction", 
-                                  sidebarPanel(
-                                    h4("Sources"),
-                                    p("My group and I found the data set published on Kaggle, 
-                              a platform designed for data scientists and machine learning
-                              practices to publish data. However, the data set originates
-                              from UC Irvine Machine Learning Repository and was collected
-                              by Prof. Paulo Cortez at the Department of Information Systems."),
-                                  ),
-                                  mainPanel(
-                                    h3("Purpose and Importance"),
-                                    p("The data set describes the academic performance of students at two 
-                            Portuguese schools. More specifically, the data sets measures student 
-                            performance in two distinct categories: mathematics and Portuguese language. 
-                            The sampling specifically targets two secondary schools: Gabriel Periera (GP) 
-                            and Mousinho da Silveira (MS)."),
-                                  ),
-                                  img(src="student-performance2.jpg", height = 300, width = 400,
-                                      alt="Student Performance Image 2"),
-                                  img(src="student-performance.jpg", height = 300, width = 400,
-                                      alt="Student Performance Image 1"),        
-                         ),
-             tabPanel("Plot",
-                      h4("Does parent's job influence student's academic performance? [Mjob: mother's job | Fjob: father's job]"),
-                      sidebarLayout(
-                        sidebarPanel(
-                          radioButtons("age", "Select the age group:",
-                                       choices = unique(student_por$age),
-                                       selected = 15)
-                        ),
-                        mainPanel(plotOutput("kayplot"), plotOutput("kayplot2"), textOutput("jobcount"), tableOutput("eachjob"))
-                      )
-             ),
-             tabPanel("Plot",
-                      sidebarLayout(
-                        sidebarPanel(
-                          p("Here is a bar plot on how extra support relates to student's average grades and their health. You can select age group you are interested in and see what it looks like."),
-                          column(6,
-                                 radioButtons("age", "Choose age",
-                                              choices = c("15", "16", "17", "18", "19", "20", "21", "22"))
-                          ),
-                          column(6,
-                                 radioButtons("color1", "Palette",
-                                              choices = c("skyblue", "green", "red", "purple", "gold")),
-                                 radioButtons("color2", "Palette",
-                                              choices = c("skyblue", "green", "red", "purple", "gold"))
-                          )
-                        ),
-                        mainPanel(
-                          plotOutput("leoplot"),
-                          textOutput("leoplotText")
-                        )
-                      )
-             ), 
-             
-             ## SARAH'S SECTION
-             tabPanel("Academic Performance Based on Grade",
-                      sidebarLayout(
-                        sidebarPanel(
-                          checkboxGroupInput("study", "Select how much the student studies:", 
-                                             choices = c("1 = less than 2 hours" = 1,
-                                                         "2 = 2 to 5 hours" = 2,
-                                                         "3 = 3 to 5 hours" = 3,
-                                                         "4 = greater than 10 hours" = 4),
-                                             selected = 1)
-                        ),
-                        mainPanel(
-                          plotOutput("sarahplot")
-                        ),
-                        tabPanel("Conclusion",
-                                 fluidRow(
-                                   column(4,
-                                          h3("Notable Insights"),
+library(shiny)	
+library(tidyverse)	
+library(dplyr)	
+student_por <- read_delim("student-por.csv")	
+# Define UI for application that draws a histogram	
+ui <- fluidPage(	
+  
+  ## KAYLEE'S SECTION	
+  navbarPage("Student dataset",	
+             tabsetPanel(type = "tabs",	
+                         tabPanel("Introduction", 	
+                                  sidebarPanel(	
+                                    h4("Sources"),	
+                                    p("My group and I found the data set published on Kaggle, a platform designed for data scientists and machine learning practices to publish data. However, the data set originates from UC Irvine Machine Learning Repository and was collected by Prof. Paulo Cortez at the Department of Information Systems.")	
+                                  ),	
+                                  mainPanel(	
+                                    h3("Purpose and Importance"),	
+                                    p("The data set describes the academic performance of students at two Portuguese schools. More specifically, the data sets measures student performance in two distinct categories: mathematics and Portuguese language. The sampling specifically targets two secondary schools: Gabriel Periera (GP) and Mousinho da Silveira (MS)."),	
+                                    img(src="student-performance2.jpg", height = 300, width = 400, alt="Student Performance Image 2"),	
+                                    img(src="student-performance.jpg", height = 300, width = 400, alt="Student Performance Image 1")        	
+                                  )	
+                         ),	
+                         tabPanel("Plot",	
+                                  h4("Does parent's job influence student's academic performance? [Mjob: mother's job | Fjob: father's job]"),	
+                                  sidebarLayout(	
+                                    sidebarPanel(	
+                                      radioButtons("student_age", "Select the age group:",	
+                                                   choices = unique(student_por$age),	
+                                                   selected = 15)	
+                                    ),	
+                                    mainPanel(plotOutput("kayplot"), plotOutput("kayplot2"), textOutput("jobcount"), tableOutput("eachjob"))	
+                                  )	
+                         ),	
+                         tabPanel("Plot",	
+                                  sidebarLayout(	
+                                    sidebarPanel(	
+                                      p("Here is a bar plot on how extra support relates to student's average grades and their health. You can select age group you are interested in and see what it looks like."),	
+                                      column(6,	
+                                             radioButtons("age", "Choose age",	
+                                                          choices = c("15", "16", "17", "18", "19", "20", "21", "22"))	
+                                      ),	
+                                      column(6,	
+                                             radioButtons("color1", "Palette",	
+                                                          choices = c("skyblue", "green", "red", "purple", "gold")),	
+                                             radioButtons("color2", "Palette",	
+                                                          choices = c("skyblue", "green", "red", "purple", "gold"))	
+                                      )	
+                                    ),	
+                                    mainPanel(	
+                                      plotOutput("leoplot"),	
+                                      textOutput("leoplotText")	
+                                    )	
+                                  )	
+                         ), 	
+                         
+                         ## SARAH'S SECTION	
+                         tabPanel("Academic Performance Based on Grade",	
+                                  sidebarLayout(	
+                                    sidebarPanel(	
+                                      checkboxGroupInput("study", "Select how much the student studies:", 	
+                                                         choices = c("1 = less than 2 hours" = 1,	
+                                                                     "2 = 2 to 5 hours" = 2,	
+                                                                     "3 = 3 to 5 hours" = 3,	
+                                                                     "4 = greater than 10 hours" = 4),	
+                                                         selected = 1)	
+                                    ),	
+                                    mainPanel(	
+                                      plotOutput("sarahplot")	
+                                    )	
+                                  )	
+                         ), 	
+                         
+                         tabPanel("Conclusion",	
+                                  fluidRow(	
+                                    column(4,	
+                                           h3("Notable Insights"),	
                                           p("The data set that we choose has many elements. Because of the extensive
                                amount of variables, it is difficult to draw strong conclusions. Overall there
                                are some correlations between average grade and outside support. The students
@@ -128,18 +119,16 @@ ui <- fluidPage(
                                    )
                       )
              )
-  )
-)
-) 
-)
-) 
+           )
+         )
+       ) 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
 ## KAYLEE'S SECTION
   selection <- reactive ({
     student_por %>% 
-      filter(age %in% input$age)
+      filter(student_age %in% input$age)
   })
   output$kayplot <- renderPlot ({
     # Plot for 'student grade vs. (Mjob)'
