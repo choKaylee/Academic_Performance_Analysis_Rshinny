@@ -29,8 +29,8 @@ ui <- fluidPage(
                                     Understanding these various factors in isolation will demonstrate which ones are indicators of academic performance. Given that 
                                     the dataset revolves around student performance, the audiences interested in the dataset include students, parents, educators, 
                                     and school administrators."),
-                                    img(src="student-performance2.jpeg", height = 300, width = 400, alt="Student Performance Image 2"),	
-                                    img(src="student-performance.jpeg", height = 300, width = 400, alt="Student Performance Image 1")        	
+                                    img(src="student-performance2.jpg", height = 300, width = 400, alt="Student Performance Image 2"),	
+                                    img(src="student-performance.jpg", height = 300, width = 400, alt="Student Performance Image 1")        	
                                   )	
                          ),	
                          ##Creating the tabpanel for the parent's occuaption plot - (KAYLEE)
@@ -48,7 +48,8 @@ ui <- fluidPage(
                                               The occupation catatories include: teacher, health care related, civil services, at home, and other. 
                                               Based on the plot results two conclusions can be draw. First, students in the “Others” category always
                                               had the maximum average value in student academic performance within the age range of 15 to 22. 
-                                              Secondly, the “Health” category was actually always the lowest average score or on the 4th pace from the lowest."))	
+                                              Secondly, the “Health” category was actually always the lowest average score or on the 4th pace from the lowest."),
+                                              br())	
                                   )	
                          ),	
                          ##Creating the tabpanel for the student health and extra support plot - (LEO)
@@ -57,7 +58,7 @@ ui <- fluidPage(
                                     sidebarPanel(	
                                       p("Here is a bar plot on how extra support relates to student's average grades and their health. You can select age group you are interested in and see what it looks like."),	
                                       column(6,	
-                                             radioButtons("age", "Choose age",	
+                                             radioButtons("age1", "Choose age",	
                                                           choices = c("15", "16", "17", "18", "19", "20", "21", "22"))	
                                       ),	
                                       column(6,	
@@ -94,14 +95,14 @@ ui <- fluidPage(
                                     mainPanel(	
                                       plotOutput("sarahplot"),
                                       textOutput("sarahplotText"),
-                              
-                                    fluidRow(
-                                      br(),
-                                      p("The line plot illustrates the average grade of students grouped by 
+                                      
+                                      fluidRow(
+                                        br(),
+                                        p("The line plot illustrates the average grade of students grouped by 
                                       their age and the amount of time they dedicate to studying. As age increases, 
                                       it becomes clear that students that study for 3 (5 - 10 hrs) or 4 (>10 hrs) consistently 
                                       score higher than students who study less.")
-                                     )
+                                      )
                                     )	
                                   )	
                          ), 	
@@ -111,7 +112,7 @@ ui <- fluidPage(
                                   fluidRow(	
                                     column(4,	
                                            h3("Notable Insights"),	
-                                          p("The data set that we choose has many elements. Because of the extensive
+                                           p("The data set that we choose has many elements. Because of the extensive
                                amount of variables, it is difficult to draw strong conclusions. Overall there
                                are some correlations between average grade and outside support. The students
                                that recieved outside suport seemed to have lower overall grades. This is
@@ -120,50 +121,64 @@ ui <- fluidPage(
                                compared to their gender. Overall females on average were recieving better grades
                                than the males. This was especially evident in the younger groups. Also, as predicted,
                                students that study more than others tend to have overall higher average grades."),
-                                          h3("Broader Implications"),
-                                          p("The implications of these insights are that, educators may want to look further
+                                           h3("Broader Implications"),
+                                           p("The implications of these insights are that, educators may want to look further
                                into resources for students that are looking for the extra help. The students that
                                were getting help should in theory have higher grades than the students that are 
                                not reaching out. Therefore there may need to be revisions on how students are
                                being assisted when they ask for help.")
-                                          ),
-                                   column(8,
-                                          h3("Pattern Insight"),
-                                          sidebarPanel(
-                                            checkboxGroupInput("sex", "Choose sex",
-                                                               choices = unique(student_por$sex),
-                                                               selected = "F")
-                                          ),
-                                          mainPanel(
-                                            plotOutput("eseelplot")
-                                          )
-                                   )
-                                 ),
-                                 fluidRow(
-                                   column(6,
-                                          h3("Data quality"),
-                                          p("Overall, the data quality of this set was clear and easy to work with. 
+                                    ),
+                                    column(8,
+                                           h3("Pattern Insight"),
+                                           sidebarPanel(
+                                             checkboxGroupInput("sex", "Choose sex",
+                                                                choices = unique(student_por$sex),
+                                                                selected = "F")
+                                           ),
+                                           mainPanel(
+                                             plotOutput("eseelplot")
+                                           )
+                                    )
+                                  ),
+                                  column(6,
+                                         h3("Insight Table"),
+                                         sidebarPanel(
+                                           fluidRow(
+                                             column(6,
+                                                    uiOutput("checkboxSex")
+                                             )
+                                           )
+                                         ),
+                                         mainPanel(
+                                           tableOutput("leotable"),
+                                           textOutput("leotext")
+                                         )
+                                  ),
+                                  fluidRow(
+                                    column(6,
+                                           h3("Data quality"),
+                                           p("Overall, the data quality of this set was clear and easy to work with. 
                                The only downside of the data set was that there were almost too many variables
                                for a small team to be able to evaluate them all and find coclusive evidence 
                                of correlations between the variables.")
-                                   ),
-                                   column(6,
-                                          h3("Future Ideas"),
-                                          p("This research could provide helpful insight into how schools
+                                    ),
+                                    column(6,
+                                           h3("Future Ideas"),
+                                           p("This research could provide helpful insight into how schools
                                and childrens lives affect their grades. In order to fully evaluate this, we
                                would need to evaluate each of the variables. In the future, this data set should
                                be assesed thurougly to provide helpful insight into students lives.")
-                                   )
-                      )
+                                    )
+                                  )
+                         )
              )
-           )
-         )
-       ) 
+  )
+) 
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
-## KAYLEE'S SECTION - plot of parent's occupation
+  
+  ## KAYLEE'S SECTION - plot of parent's occupation
   selection <- reactive ({
     student_por %>% 
       filter(age %in% input$age)
@@ -188,16 +203,17 @@ server <- function(input, output) {
     count_total <- count(selection())
     paste("students in age of", input$age, "has", (count_total - 1), "other students in the same age")
   })
- 
+  
   output$eachjob <- renderTable ({
     total_count <- selection() %>% 
       summarize(Mjob_count = n_distinct(Mjob), Fjob_count = n_distinct(Fjob)) 
-
-##LEO'S SECTION - plot of student health 
   })
+  
+  
+  ##LEO'S SECTION - plot of student health 
   ageSample <- reactive({
-    sexDiff <- student_por %>%
-      filter(age %in% input$age)
+    student_por %>%
+      filter(age %in% input$age1)
   })
   
   output$leoplot <- renderPlot({
@@ -210,53 +226,81 @@ server <- function(input, output) {
            x = "Health", y = "Average Grades", fill = "Extra Support") +
       scale_fill_manual(values = c(input$color1, input$color2))
   })
+  
   ##interactive text
   output$leoplotText <- renderText({
     paste("This is the how ", input$age," years old students perform
             and their health with and without extra school support")
   })
   
-##SARAH'S SECTION - plot of study time 
-    sample <- reactive({
-      student_por %>% 
-        filter(studytime %in% input$study)
-    })
-    
-    output$sarahplot <- renderPlot ({
-      data <- sample() %>% 
-        group_by(age, studytime) %>% 
-        summarise(avg_grade = mean(G1 + G2 + G3)/3) 
-      ggplot(data, aes(age,avg_grade, col=factor(studytime))) +
-        geom_point() + 
-        geom_line() +
-        ylim(5, 20) +
-        scale_x_continuous(breaks = 15:22) +
-        labs(title = "The Effect of Study Time on Average Grade by Age", x = "age", y = "Average Grade")
-    })
-    ##interactive text
-    output$sarahplotText <- renderText({
-      paste("The line chart displays the mean grades achieved by students belonging to different age groups who have recieved a",
-            input$study, "for study time.")
-    })
-    
-## ESEEL SECTION - additional plot of student sex
-    
-    eseelsample <- reactive({
-      student_por %>% 
-        filter(sex %in% input$sex)
-    })
-    
-    output$eseelplot <- renderPlot ({
-      eseeldata <- eseelsample() %>% 
-        group_by(age, sex) %>% 
-        summarise(avg_grd = mean(G1 + G2 + G3)/3) 
-      ggplot(eseeldata, aes(age,avg_grd, col=factor(sex))) +
-        geom_point() + 
-        geom_line() +
-        labs(x = "Age", y = "Average Grade", title = "Age vs Average Grade by Sex",
-             col = "Sex")
-    })
-    
+  ##Data Table in the conclusion
+  output$checkboxSex <- renderUI({
+    checkboxGroupInput("sex1", "Choose sex",
+                       choices = unique(student_por$sex)
+    )
+  })
+  
+  sexSample <- reactive({
+    student_por %>%
+      filter(sex %in% input$sex1)
+  })
+  
+  output$leotable <- renderTable({
+    sexSample() %>% 
+      group_by(sex, age) %>% 
+      summarize(avgGrade = mean(G1 + G2 + G3)/3)
+  })
+  
+  output$leotext <- renderText({
+    if(nrow(sexSample()) == 0)
+      "Please select gender"
+    else
+      paste("Table of ", str_flatten(input$sex, " and "), ", their
+              respective ages and average grades per period, for a
+              total of three periods.")
+  })
+  
+  ##SARAH'S SECTION - plot of study time 
+  sample <- reactive({
+    student_por %>% 
+      filter(studytime %in% input$study)
+  })
+  
+  output$sarahplot <- renderPlot ({
+    data <- sample() %>% 
+      group_by(age, studytime) %>% 
+      summarise(avg_grade = mean(G1 + G2 + G3)/3) 
+    ggplot(data, aes(age,avg_grade, col=factor(studytime))) +
+      geom_point() + 
+      geom_line() +
+      ylim(5, 20) +
+      scale_x_continuous(breaks = 15:22) +
+      labs(title = "The Effect of Study Time on Average Grade by Age", x = "age", y = "Average Grade")
+  })
+  ##interactive text
+  output$sarahplotText <- renderText({
+    paste("The line chart displays the mean grades achieved by students belonging to different age groups who have recieved a",
+          input$study, "for study time.")
+  })
+  
+  ## ESEEL SECTION - additional plot of student sex
+  
+  eseelsample <- reactive({
+    student_por %>% 
+      filter(sex %in% input$sex)
+  })
+  
+  output$eseelplot <- renderPlot ({
+    eseeldata <- eseelsample() %>% 
+      group_by(age, sex) %>% 
+      summarise(avg_grd = mean(G1 + G2 + G3)/3) 
+    ggplot(eseeldata, aes(age,avg_grd, col=factor(sex))) +
+      geom_point() + 
+      geom_line() +
+      labs(x = "Age", y = "Average Grade", title = "Age vs Average Grade by Sex",
+           col = "Sex")
+  })
+  
 }
 # Run the application 
 shinyApp(ui = ui, server = server)
