@@ -6,32 +6,53 @@ student_por <- read_delim("student-por.csv")
 ui <- fluidPage(	
   
   ## KAYLEE'S SECTION	
-  navbarPage("Student dataset",	
+  navbarPage("INFO 201: Student Academic Performance",	
+             ##The overview tab - (ESEEL)
              tabsetPanel(type = "tabs",	
-                         tabPanel("Introduction", 	
+                         tabPanel("Project Overview", 	
                                   sidebarPanel(	
                                     h4("Sources"),	
-                                    p("My group and I found the data set published on Kaggle, a platform designed for data scientists and machine learning practices to publish data. However, the data set originates from UC Irvine Machine Learning Repository and was collected by Prof. Paulo Cortez at the Department of Information Systems.")	
+                                    HTML("We will be working with the <a href= 'https://www.kaggle.com/datasets/larsen0966/student-performance-data-set'> Student Performance Data Set </a> from the UC 
+                                      Irvine Department of Information Systems published on Kaggle.
+                                      The data set describes the academic performance of students at two Portuguese schools. More specifically, the data sets measure student 
+                                      performance in two distinct categories: mathematics and Portuguese language. The sampling specifically targets two secondary schools: 
+                                      Gabriel Periera (GP) and Mousinho da Silveira (MS).")	
                                   ),	
                                   mainPanel(	
                                     h3("Purpose and Importance"),	
-                                    p("The data set describes the academic performance of students at two Portuguese schools. More specifically, the data sets measures student performance in two distinct categories: mathematics and Portuguese language. The sampling specifically targets two secondary schools: Gabriel Periera (GP) and Mousinho da Silveira (MS)."),	
-                                    img(src="student-performance2.jpg", height = 300, width = 400, alt="Student Performance Image 2"),	
-                                    img(src="student-performance.jpg", height = 300, width = 400, alt="Student Performance Image 1")        	
+                                    p("Education is undeniably one of the most important pillars in a child's life. Despite the fact
+                                    that current literature recognizes that student academic success is often the determining factor 
+                                    in positive life outcomes, the variables that indicate student success are widely agreed upon. With the
+                                    final results, we hope to build upon existing work by identifying the relationship between different variables and student grades."),	
+                                    br(),
+                                    p("The audience is interested in seeing how various factors, both inside and outside of the home, affect student performance. 
+                                    Understanding these various factors in isolation will demonstrate which ones are indicators of academic performance. Given that 
+                                    the dataset revolves around student performance, the audiences interested in the dataset include students, parents, educators, 
+                                    and school administrators."),
+                                    img(src="student-performance2.jpeg", height = 300, width = 400, alt="Student Performance Image 2"),	
+                                    img(src="student-performance.jpeg", height = 300, width = 400, alt="Student Performance Image 1")        	
                                   )	
                          ),	
-                         tabPanel("Plot",	
+                         ##Creating the tabpanel for the parent's occuaption plot - (KAYLEE)
+                         tabPanel("Parent's Occupation",	
                                   h4("Does parent's job influence student's academic performance? [Mjob: mother's job | Fjob: father's job]"),	
                                   sidebarLayout(	
                                     sidebarPanel(	
-                                      radioButtons("student_age", "Select the age group:",	
-                                                   choices = unique(student_por$age),	
+                                      radioButtons("age", "Select the age group:",	
+                                                   choices = c(15, 16, 17, 18, 19, 20, 21, 22),	
                                                    selected = 15)	
                                     ),	
-                                    mainPanel(plotOutput("kayplot"), plotOutput("kayplot2"), textOutput("jobcount"), tableOutput("eachjob"))	
+                                    mainPanel(plotOutput("kayplot"), plotOutput("kayplot2"), textOutput("jobcount"), tableOutput("eachjob"),
+                                              br(),
+                                              p("The bar plot illustrates the average grades of students grouped by the occupation of their parents. 
+                                              The occupation catatories include: teacher, health care related, civil services, at home, and other. 
+                                              Based on the plot results two conclusions can be draw. First, students in the “Others” category always
+                                              had the maximum average value in student academic performance within the age range of 15 to 22. 
+                                              Secondly, the “Health” category was actually always the lowest average score or on the 4th pace from the lowest."))	
                                   )	
                          ),	
-                         tabPanel("Plot",	
+                         ##Creating the tabpanel for the student health and extra support plot - (LEO)
+                         tabPanel("Student Health",	
                                   sidebarLayout(	
                                     sidebarPanel(	
                                       p("Here is a bar plot on how extra support relates to student's average grades and their health. You can select age group you are interested in and see what it looks like."),	
@@ -48,13 +69,19 @@ ui <- fluidPage(
                                     ),	
                                     mainPanel(	
                                       plotOutput("leoplot"),	
-                                      textOutput("leoplotText")	
+                                      textOutput("leoplotText"),
+                                      br(),
+                                      p("The bar plot measures 3 variables: student average grade, extra support received, and health. 
+                                      The plot demonstrates the average grade of students catagorized by ages, along with the corresponding health
+                                      states and addtional educational support. The graph indicates that students within the age range of 15 to 22 
+                                      who received extra support were not doing as well in classes and the extra support does not seem to affect whether
+                                      the students will have better or poor health.")
                                     )	
                                   )	
                          ), 	
                          
-                         ## SARAH'S SECTION	
-                         tabPanel("Academic Performance Based on Grade",	
+                         ##Creating the plot measuring study time - (SARAH)
+                         tabPanel("Study Time",	
                                   sidebarLayout(	
                                     sidebarPanel(	
                                       checkboxGroupInput("study", "Select how much the student studies:", 	
@@ -65,11 +92,21 @@ ui <- fluidPage(
                                                          selected = 1)	
                                     ),	
                                     mainPanel(	
-                                      plotOutput("sarahplot")	
+                                      plotOutput("sarahplot"),
+                                      textOutput("sarahplotText"),
+                              
+                                    fluidRow(
+                                      br(),
+                                      p("The line plot illustrates the average grade of students grouped by 
+                                      their age and the amount of time they dedicate to studying. As age increases, 
+                                      it becomes clear that students that study for 3 (5 - 10 hrs) or 4 (>10 hrs) consistently 
+                                      score higher than students who study less.")
+                                     )
                                     )	
                                   )	
                          ), 	
                          
+                         ##Final Takeaways - (ESEEL)
                          tabPanel("Conclusion",	
                                   fluidRow(	
                                     column(4,	
@@ -122,13 +159,14 @@ ui <- fluidPage(
            )
          )
        ) 
+
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-## KAYLEE'S SECTION
+## KAYLEE'S SECTION - plot of parent's occupation
   selection <- reactive ({
     student_por %>% 
-      filter(student_age %in% input$age)
+      filter(age %in% input$age)
   })
   output$kayplot <- renderPlot ({
     # Plot for 'student grade vs. (Mjob)'
@@ -145,15 +183,17 @@ server <- function(input, output) {
       geom_col()
     
   })
+  ##interactive text
   output$jobcount <- renderText ({
     count_total <- count(selection())
     paste("students in age of", input$age, "has", (count_total - 1), "other students in the same age")
   })
+ 
   output$eachjob <- renderTable ({
     total_count <- selection() %>% 
       summarize(Mjob_count = n_distinct(Mjob), Fjob_count = n_distinct(Fjob)) 
 
-##LEO'S SECTION
+##LEO'S SECTION - plot of student health 
   })
   ageSample <- reactive({
     sexDiff <- student_por %>%
@@ -170,13 +210,13 @@ server <- function(input, output) {
            x = "Health", y = "Average Grades", fill = "Extra Support") +
       scale_fill_manual(values = c(input$color1, input$color2))
   })
-  
+  ##interactive text
   output$leoplotText <- renderText({
     paste("This is the how ", input$age," years old students perform
             and their health with and without extra school support")
   })
   
-##SARAH'S SECTION
+##SARAH'S SECTION - plot of study time 
     sample <- reactive({
       student_por %>% 
         filter(studytime %in% input$study)
@@ -193,8 +233,13 @@ server <- function(input, output) {
         scale_x_continuous(breaks = 15:22) +
         labs(title = "The Effect of Study Time on Average Grade by Age", x = "age", y = "Average Grade")
     })
+    ##interactive text
+    output$sarahplotText <- renderText({
+      paste("The line chart displays the mean grades achieved by students belonging to different age groups who have recieved a",
+            input$study, "for study time.")
+    })
     
-## ESEEL SECTION
+## ESEEL SECTION - additional plot of student sex
     
     eseelsample <- reactive({
       student_por %>% 
@@ -211,6 +256,7 @@ server <- function(input, output) {
         labs(x = "Age", y = "Average Grade", title = "Age vs Average Grade by Sex",
              col = "Sex")
     })
+    
 }
 # Run the application 
 shinyApp(ui = ui, server = server)
