@@ -22,7 +22,7 @@ ui <- fluidPage(
                                     h3("Purpose and Importance"),	
                                     p("Education is undeniably one of the most important pillars in a child's life. Despite the fact
                                     that current literature recognizes that student academic success is often the determining factor 
-                                    in positive life outcomes, the variables that indicate student success are widely agreed upon. With the
+                                    in positive life outcomes, the variables that indicate student success are widely disagreed upon. With the
                                     final results, we hope to build upon existing work by identifying the relationship between different variables and student grades."),	
                                     br(),
                                     p("The audience is interested in seeing how various factors, both inside and outside of the home, affect student performance. 
