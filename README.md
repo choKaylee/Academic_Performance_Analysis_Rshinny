@@ -2,6 +2,8 @@
 
 ## Project Proposal
 
+Link for the Final Project: https://sarah114tran.shinyapps.io/group_final/
+
 ### Data and Audience
 
 What is the dataset you’ll be working with?
